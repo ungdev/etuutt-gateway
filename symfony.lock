@@ -588,6 +588,9 @@
     "twig/twig": {
         "version": "v3.0.5"
     },
+    "web-token/jwt-bundle": {
+        "version": "v2.2.2"
+    },
     "web-token/jwt-checker": {
         "version": "v2.2.2"
     },
