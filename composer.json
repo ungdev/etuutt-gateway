@@ -1,6 +1,14 @@
 {
     "type": "project",
-    "license": "proprietary",
+    "authors": [
+        {
+            "name": "UTT NET GROUP",
+            "email": "ung@utt.fr",
+            "homepage": "https://ung.utt.fr",
+            "role": "Organization"
+        }
+    ],
+    "license": "MIT",
     "require": {
         "php": ">=7.2.5",
         "ext-ctype": "*",
