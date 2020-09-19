@@ -5,6 +5,7 @@
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
     JWT_PRIVATE_KEY: '%env(JWT_PRIVATE_KEY)%'
+    ETUUTT_FRONT_BASE_URL: '%env(ETUUTT_FRONT_BASE_URL)%'
 
 services:
     # default configuration for services in *this* file
@@ -34,3 +35,4 @@ services:
         arguments:
             - '%JWT_PRIVATE_KEY%'
             - '@App\Repository\UserRepository'
+            - '%ETUUTT_FRONT_BASE_URL%'

@@ -7,7 +7,7 @@ use App\Service\JWTManagement;
 use Doctrine\ORM\EntityManagerInterface;
 use phpCAS;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -24,7 +24,7 @@ class ConnexionController extends AbstractController
     /**
      * @Route("/cas", name="cas")
      *
-     * @return JsonResponse
+     * @return RedirectResponse
      */
     public function cas(EntityManagerInterface $entityManager, JWTManagement $JWTManagement)
     {
@@ -46,12 +46,9 @@ class ConnexionController extends AbstractController
                 $user = $entityManager->getRepository(User::class)->findOneBy(['casUid' => phpCAS::getUser()]);
             }
 
-            $data = [
-                'jwt' => $JWTManagement->getJWTFromUser($user),
-            ];
-
-            //TODO : return on front with parameter ?
-            return new JsonResponse($data, 200);
+            return $this->redirect($JWTManagement->getFrontURLFromUser($user));
         }
+
+        throw $this->createAccessDeniedException('Auth cas failed !');
     }
 }

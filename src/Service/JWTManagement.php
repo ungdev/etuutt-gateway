@@ -19,10 +19,13 @@ class JWTManagement
 
     private $userRepository;
 
-    public function __construct(string $jwkAsJson, UserRepository $userRepository)
+    private $frontBaseUrl;
+
+    public function __construct(string $jwkAsJson, UserRepository $userRepository, string $frontBaseUrl)
     {
         $this->jwk = JWK::createFromJson($jwkAsJson);
         $this->userRepository = $userRepository;
+        $this->frontBaseUrl = $frontBaseUrl;
     }
 
     public function getJWTFromUser(User $user): string
@@ -66,5 +69,14 @@ class JWTManagement
         }
 
         return $this->userRepository->find($jwt->claims->get('id'));
+    }
+
+    public function getFrontURLFromUser(User $user)
+    {
+        $data = [
+            'jwt' => $this->getJWTFromUser($user),
+        ];
+
+        return $this->frontBaseUrl.'?'.http_build_query($data);
     }
 }
