@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Kernel;
 use App\Service\JWTManagement;
 use Doctrine\ORM\EntityManagerInterface;
 use phpCAS;
@@ -26,7 +27,7 @@ class ConnexionController extends AbstractController
      *
      * @return RedirectResponse
      */
-    public function cas(EntityManagerInterface $entityManager, JWTManagement $JWTManagement)
+    public function cas(EntityManagerInterface $entityManager, JWTManagement $JWTManagement, Kernel $kernel)
     {
         phpCAS::client(
             CAS_VERSION_2_0,
@@ -34,7 +35,10 @@ class ConnexionController extends AbstractController
             443,
             '/cas'
         );
-        phpCAS::setNoCasServerValidation(); //TODO: changer et rajouter le certificat
+        phpCAS::setCasServerCACert(
+            $kernel->getProjectDir().'/config/certificates/chain-cas-utt.pem',
+            true
+        );
         phpCAS::forceAuthentication();
         if (phpCAS::getUser()) {
             if (!$entityManager->getRepository(User::class)->findOneBy(['casUid' => phpCAS::getUser()])) {
