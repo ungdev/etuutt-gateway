@@ -6,6 +6,7 @@
 parameters:
     JWT_PRIVATE_KEY: '%env(JWT_PRIVATE_KEY)%'
     ETUUTT_FRONT_BASE_URL: '%env(ETUUTT_FRONT_BASE_URL)%'
+    UNG_LDAP_HOST: '%env(UNG_LDAP_HOST)%'
 
 services:
     # default configuration for services in *this* file

@@ -3,12 +3,17 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Form\LdapUNGType;
 use App\Kernel;
 use App\Service\JWTManagement;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use phpCAS;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Ldap\Ldap;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -54,5 +59,45 @@ class ConnexionController extends AbstractController
         }
 
         throw $this->createAccessDeniedException('Auth cas failed !');
+    }
+
+    /**
+     * @Route("/ldapUNG", name="ldapUNG")
+     */
+    public function ldapUNG(Request $request, EntityManagerInterface $entityManager, JWTManagement $JWTManagement)
+    {
+        $form = $this->createForm(LdapUNGType::class);
+        //$form->handleRequest($request);
+        $form->submit($request->request->all());
+        if ($form->isSubmitted() && $form->isValid()) {
+            $ldap = Ldap::create('ext_ldap', [
+                'connection_string' => 'ldap://'.$this->getParameter('UNG_LDAP_HOST').':389',
+            ]);
+
+            try {
+                $ldap->bind(
+                    'uid='.$form->get('username')->getData().',cn=users,cn=accounts,dc=uttnetgroup,dc=net',
+                    $form->get('password')->getData()
+                );
+            } catch (Exception $exception) {
+                echo $exception->getMessage();
+                echo 'uid='.$form->get('username')->getData().',cn=users,cn=accounts,dc=uttnetgroup,dc=net\n';
+                echo $form->get('password')->getData();
+
+                throw $this->createAccessDeniedException('Auth ldap ung failed');
+            }
+
+            if (!$entityManager->getRepository(User::class)
+                ->findOneBy(['ldapUNGUid' => $form->get('username')->getData()])) {
+                throw $this->createNotFoundException('User not found');
+            }
+            $user = $entityManager->getRepository(User::class)
+                ->findOneBy(['ldapUNGUid' => $form->get('username')->getData()])
+                ;
+
+            return $this->redirect($JWTManagement->getFrontURLFromUser($user));
+        }
+
+        return new Response('No username or password submitted', 400);
     }
 }
