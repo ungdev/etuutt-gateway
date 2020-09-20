@@ -67,8 +67,7 @@ class ConnexionController extends AbstractController
     public function ldapUNG(Request $request, EntityManagerInterface $entityManager, JWTManagement $JWTManagement)
     {
         $form = $this->createForm(LdapUNGType::class);
-        //$form->handleRequest($request);
-        $form->submit($request->request->all());
+        $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $ldap = Ldap::create('ext_ldap', [
                 'connection_string' => 'ldap://'.$this->getParameter('UNG_LDAP_HOST').':389',
