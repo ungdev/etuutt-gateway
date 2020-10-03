@@ -71,12 +71,16 @@ class JWTManagement
         return $this->userRepository->find($jwt->claims->get('id'));
     }
 
-    public function getFrontURLFromUser(User $user)
+    public function getFrontURLFromUser(User $user, $baseUrl = "")
     {
         $data = [
             'jwt' => $this->getJWTFromUser($user),
         ];
 
-        return $this->frontBaseUrl.'?'.http_build_query($data);
+        if ($baseUrl === "") {
+            return $this->frontBaseUrl.'?'.http_build_query($data);
+        } else {
+            return $baseUrl.'?'.http_build_query($data);
+        }
     }
 }
